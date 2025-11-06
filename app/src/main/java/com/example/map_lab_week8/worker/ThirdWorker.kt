@@ -5,7 +5,7 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import androidx.work.Data
 
-class SecondWorker(context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {
+class ThirdWorker(context: Context, workerParams: WorkerParameters) : Worker(context, workerParams) {
 
     override fun doWork(): Result {
         val id = inputData.getString(INPUT_DATA_ID)

@@ -9,7 +9,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 
-class NotificationService : Service() {
+class SecondNotificationService : Service() {
 
     private lateinit var notificationBuilder: NotificationCompat.Builder
     private lateinit var serviceHandler: Handler
@@ -19,7 +19,7 @@ class NotificationService : Service() {
     override fun onCreate() {
         super.onCreate()
         notificationBuilder = startForegroundService()
-        val handlerThread = HandlerThread("SecondThread").apply { start() }
+        val handlerThread = HandlerThread("ThirdThread").apply { start() }
         serviceHandler = Handler(handlerThread.looper)
     }
 
@@ -28,7 +28,7 @@ class NotificationService : Service() {
         val id = intent?.getStringExtra(EXTRA_ID) ?: throw IllegalStateException("Channel ID must be provided")
 
         serviceHandler.post {
-            countDownFromTenToZero(notificationBuilder)
+            countDownFromFiveToZero(notificationBuilder)
             notifyCompletion(id)
             stopForeground(STOP_FOREGROUND_REMOVE)
             stopSelf()
@@ -52,8 +52,8 @@ class NotificationService : Service() {
 
     private fun createNotificationChannel(): String {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val id = "001"
-            val name = "001 Channel"
+            val id = "002"
+            val name = "002 Channel"
             val importance = NotificationManager.IMPORTANCE_DEFAULT
             val channel = NotificationChannel(id, name, importance)
             val manager = ContextCompat.getSystemService(this, NotificationManager::class.java)
@@ -64,19 +64,19 @@ class NotificationService : Service() {
 
     private fun getNotificationBuilder(pendingIntent: PendingIntent, channelId: String): NotificationCompat.Builder {
         return NotificationCompat.Builder(this, channelId)
-            .setContentTitle("Second worker process is done")
-            .setContentText("Check it out!")
+            .setContentTitle("Third worker process is complete!")
+            .setContentText("Final step finished!")
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentIntent(pendingIntent)
-            .setTicker("Second worker process is done, check it out!")
+            .setTicker("Third worker done!")
             .setOngoing(true)
     }
 
-    private fun countDownFromTenToZero(builder: NotificationCompat.Builder) {
+    private fun countDownFromFiveToZero(builder: NotificationCompat.Builder) {
         val manager = getSystemService(NotificationManager::class.java)
-        for (i in 10 downTo 0) {
+        for (i in 5 downTo 0) {
             Thread.sleep(1000L)
-            builder.setContentText("$i seconds until last warning").setSilent(true)
+            builder.setContentText("Final countdown: $i seconds").setSilent(true)
             manager?.notify(NOTIFICATION_ID, builder.build())
         }
     }
@@ -88,7 +88,7 @@ class NotificationService : Service() {
     }
 
     companion object {
-        const val NOTIFICATION_ID = 0xCA7
+        const val NOTIFICATION_ID = 0xCA8
         const val EXTRA_ID = "Id"
         private val mutableID = MutableLiveData<String>()
         val trackingCompletion: LiveData<String> = mutableID
